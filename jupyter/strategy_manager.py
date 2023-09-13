@@ -32,15 +32,15 @@ class StrategyManager:
                 operate(o, s)
 
     def buy_operate(self, operation, strategy):
-        ohcl = self.market_data.read_data(
+        ohlc = self.market_data.read_data(
             operation.stock, operation.timeframe, strategy.candles_range
         )
-        if strategy.check_buy_signal(ohcl):
+        if strategy.check_buy_signal(ohlc):
             self.market_data.buy(operation.stock, operation.volume)
 
     def sell_operate(self, operation, strategy):
-        ohcl = self.market_data.read_data(
+        ohlc = self.market_data.read_data(
             operation.stock, operation.timeframe, strategy.candles_range
         )
-        if strategy.check_sell_signal(ohcl):
+        if strategy.check_sell_signal(ohlc):
             self.market_data.sell(operation.stock, operation.volume)

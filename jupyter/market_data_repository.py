@@ -13,8 +13,8 @@ class MarketDataRepository:
         shift = 0
         if timeframe is None:
             timeframe = self.mt.TIMEFRAME_D1
-        ohcl = self.mt.copy_rates_from_pos(stock, timeframe, shift, interval_required)
-        return ohcl
+        ohlc = self.mt.copy_rates_from_pos(stock, timeframe, shift, interval_required)
+        return ohlc
 
     def buy(self, stock, volume):
         self.mt.Buy(stock, volume, comment=f"Fapi: {stock} {volume}")
