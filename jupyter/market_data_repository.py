@@ -22,5 +22,9 @@ class MarketDataRepository:
     def sell(self, stock, volume):
         self.mt.Sell(stock, volume)
 
+    def positions(self):
+        posicoes = self.mt.positions_get()
+        return posicoes
+
 
 # rico_prod = "C:\\Program Files\\Rico - MetaTrader 5\\terminal64.exe"

@@ -20,11 +20,11 @@ class StrategyManager:
 
     def can_operate(self):
         now = datetime.now()
-        return (
-            self.user.enable_trading
-            and self.user.trading_time_start <= now
-            and now <= self.user.trading_time_end
+        trading_time_on = (
+            self.user.trading_time_start <= now and now <= self.user.trading_time_end
         )
+        is_positioned = len(self.market_data.positions())
+        return self.user.enable_trading and trading_time_on and is_positioned
 
     def check_signal(self, operate):
         for o in self.user.operations:

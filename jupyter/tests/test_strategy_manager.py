@@ -7,7 +7,8 @@ from jupyter.user import User
 
 class MarketDataRepoStub():
     def read_data(self, *args):
-        return {'low':[2,3,4], 'open':[3,4,5],'close':[4,5,6],'high':[5,6,7]}
+        bull_value = {'low':[2,3,4], 'open':[3,4,5],'close':[4,5,6],'high':[5,6,7]}
+        return bull_value
     def buy(self, *args):
         return True
     def sell(self, *args):
