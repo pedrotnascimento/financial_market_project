@@ -1,20 +1,48 @@
-class User:
-    strategy = []
+from jupyter.operation import Operation
+from jupyter.strategies.min_max_strategy import MinMaxStrategy
+from datetime  import datetime
+class User():
+    strategies: list[MinMaxStrategy] = []
+    operations: list[Operation] = []
+    enable_trading = True
+    trading_time_start = None
+    trading_time_end = None
+    risk_money = -1
+    enable_buy = True
+    enable_sell = True
+    
     def __init__(
         self,
         enable_trading=True,
-        trading_time=True,
+        trading_time_start=None,
+        trading_time_end=None,
         strategies=[],
         risk_money=10,
         enable_buy=True,
         enable_sell=True,
     ) -> None:
         self.enable_trading = enable_trading
-        self.trading_time = trading_time
+
+        now = datetime.now()
+        if trading_time_start:
+            self.trading_time_start = trading_time_start
+        else:
+            start = datetime(now.year,now.month,now.day,12)
+            self.trading_time_start = start
+
+        if trading_time_end:
+            self.trading_time_end = trading_time_end
+        else:
+            end = datetime(now.year,now.month,now.day,16,35)
+            self.trading_time_end = end
+            
         self.strategies = strategies
         self.risk_money = risk_money
         self.enable_buy = enable_buy
         self.enable_sell = enable_sell
     
-    def subscribe_strategy(self,strategy):
+    def add_strategy(self,strategy):
         self.strategies.append(strategy)
+    
+    def add_operation(self,operation: Operation):
+        self.operations.append(operation)
