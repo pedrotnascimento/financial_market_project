@@ -13,3 +13,6 @@ class MinMaxStrategy:
         highest_high = max(interval)
         if ohlc["high"][0] >= highest_high:
             return True
+
+    def __str__(self):
+        return "MinMaxStrategy"
