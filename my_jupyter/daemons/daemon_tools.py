@@ -44,9 +44,7 @@ class DaemonThreadMini(threading.Thread):
 
     def wait_until_restart_cycle(self):
         remaining_time_to_reset = self.get_remaining_time()
-        # print(["resting", remaining_time_to_reset])
         time.sleep(remaining_time_to_reset)
-        # print(["going again"])
         # remaining_time_to_reset = self.get_remaining_time_with_sleep()
 
     def get_remaining_time(self):
@@ -66,9 +64,7 @@ class DaemonThreadMini(threading.Thread):
                 remaining_time_to_reset_in_seconds = 1
             elif self.seconds < 1 and self.mseconds > 0:
                 miliseconds_in_second = 1000.0
-                print("here")
                 remaining_time_to_reset_in_seconds = self.mseconds / miliseconds_in_second
-        print(["bef", remaining_time_to_reset_in_seconds])
         if remaining_time_to_reset_in_seconds != 0:
             return remaining_time_to_reset_in_seconds
         non_zero_remaining_time = 1
