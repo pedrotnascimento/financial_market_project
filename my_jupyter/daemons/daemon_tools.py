@@ -4,10 +4,12 @@ from IPython.display import display, HTML, clear_output
 from datetime import timedelta
 import time
 
+
 class DaemonThreadMini(threading.Thread):
     def __init__(
         self,
         job_to_execute,
+        mseconds=0,
         seconds=0,
         minutes=0,
         hours=0,
@@ -21,6 +23,7 @@ class DaemonThreadMini(threading.Thread):
         threading.Thread.__init__(self)
 
         self.job_to_execute = job_to_execute
+        self.mseconds = mseconds
         self.seconds = seconds
         self.minutes = minutes
         self.hours = hours
@@ -32,7 +35,7 @@ class DaemonThreadMini(threading.Thread):
         self.atualiza_sinais_por_segundo()
 
     def atualiza_sinais_por_segundo(self):
-        clear_output(wait=True)
+        # clear_output(wait=True)
 
         self.job_to_execute(**self.kwargs)
         while True:
@@ -41,37 +44,45 @@ class DaemonThreadMini(threading.Thread):
 
     def wait_until_restart_cycle(self):
         remaining_time_to_reset = self.get_remaining_time()
-
-        while remaining_time_to_reset == 0:
-            remaining_time_to_reset = self.get_remaining_time_with_sleep()
+        # print(["resting", remaining_time_to_reset])
+        time.sleep(remaining_time_to_reset)
+        # print(["going again"])
+        # remaining_time_to_reset = self.get_remaining_time_with_sleep()
 
     def get_remaining_time(self):
         tcurr = time.localtime()
+        seconds_in_minute = 60
+        remaining_time_to_reset_in_seconds = 1
         if self.minutes > 1:
-            remaining_time_to_reset = tcurr.tm_min % self.minutes
+            remaining_time_to_reset_in_seconds = (
+                tcurr.tm_min % self.minutes
+            ) * seconds_in_minute - tcurr.tm_sec
         elif self.minutes == 1:
-            remaining_time_to_reset = tcurr.tm_sec
+            remaining_time_to_reset_in_seconds = seconds_in_minute - tcurr.tm_sec
         elif self.minutes < 1:
-            remaining_time_to_reset = tcurr.tm_sec % self.seconds
-        return remaining_time_to_reset
+            if self.seconds > 1:
+                remaining_time_to_reset_in_seconds = tcurr.tm_sec % self.seconds
+            elif self.seconds == 1:
+                remaining_time_to_reset_in_seconds = 1
+            elif self.seconds < 1 and self.mseconds > 0:
+                miliseconds_in_second = 1000.0
+                print("here")
+                remaining_time_to_reset_in_seconds = self.mseconds / miliseconds_in_second
+        print(["bef", remaining_time_to_reset_in_seconds])
+        if remaining_time_to_reset_in_seconds != 0:
+            return remaining_time_to_reset_in_seconds
+        non_zero_remaining_time = 1
+        return non_zero_remaining_time
 
     def get_remaining_time_with_sleep(self):
-        tcurr = time.localtime()
-        if self.minutes > 1:
-            remaining_time_to_reset = tcurr.tm_min % self.minutes
-            time.sleep(self.segundos_wait)
-        elif self.minutes == 1:
-            remaining_time_to_reset = tcurr.tm_sec
-            time.sleep(0.5)
-        elif self.minutes == 0 and self.seconds > 0:
-            remaining_time_to_reset = tcurr.tm_sec % self.seconds
-            time.sleep(0.5)
+        remaining_time_to_reset = self.get_remaining_time()
+        time.sleep(0.010)
         return remaining_time_to_reset
 
     def start_cycle(self):
         if self.hours == 0:
-            self.wait_until_finish_cycle()
-            clear_output(wait=True)
+            # self.wait_until_finish_cycle()
+            # clear_output(wait=True)
             self.job_to_execute(**self.kwargs)
             # if alerta_tempo:
             #     Mbox.Alerta("SINAIS ATUALIZADOS", "OK")
