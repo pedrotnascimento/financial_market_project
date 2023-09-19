@@ -1,6 +1,6 @@
 import unittest
 
-from jupyter.strategies.min_max_strategy import MinMaxStrategy
+from strategies.min_max_strategy import MinMaxStrategy
 
 
 class MinMaxTest(unittest.TestCase):

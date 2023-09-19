@@ -1,5 +1,5 @@
-from jupyter.operation import Operation
-from jupyter.strategies.min_max_strategy import MinMaxStrategy
+from my_jupyter.operation import Operation
+from my_jupyter.strategies.min_max_strategy import MinMaxStrategy
 from datetime  import datetime
 class User():
     # strategies: list[MinMaxStrategy] = []

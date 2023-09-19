@@ -1,9 +1,9 @@
 import unittest
 from  unittest.mock import MagicMock
-from jupyter.operation import Operation
-from jupyter.strategies.min_max_strategy import MinMaxStrategy
-from jupyter.strategy_manager import StrategyManager
-from jupyter.user import User
+from operation import Operation
+from strategies.min_max_strategy import MinMaxStrategy
+from strategy_manager import StrategyManager
+from user import User
 
 class MarketDataRepoStub():
     def read_data(self, *args):
@@ -36,7 +36,7 @@ class TestStrategyManager(unittest.TestCase):
         self.strategy_manager.can_operate = MagicMock(return_value= True)
 
         user = User()
-        op = Operation("ABCD", volume=1, timeframe=2, buy=True, sell=True, enable=True)
+        op = Operation("ABCD", volume=1, timeframe=2, can_buy=True, can_sell=True, enable=True)
         strategy = MinMaxStrategy()
         user.add_operation(op)
         user.add_strategy(strategy)
@@ -62,7 +62,7 @@ class TestStrategyManager(unittest.TestCase):
         self.strategy_manager.can_operate = MagicMock(return_value= True)
 
         user = User()
-        op = Operation("ABCD", volume=1, timeframe=2, buy=True, sell=True, enable=True)
+        op = Operation("ABCD", volume=1, timeframe=2, can_buy=True, can_sell=True, enable=True)
         strategy = MinMaxStrategy()
         user.add_operation(op)
         user.add_strategy(strategy)
@@ -88,7 +88,7 @@ class TestStrategyManager(unittest.TestCase):
         self.strategy_manager.can_operate = MagicMock(return_value= True)
 
         user = User()
-        op = Operation("ABCD", volume=1, timeframe=2, buy=True, sell=True, enable=True)
+        op = Operation("ABCD", volume=1, timeframe=2, can_buy=True, can_sell=True, enable=True)
         strategy = MinMaxStrategy()
         user.add_operation(op)
         user.add_strategy(strategy)
@@ -114,7 +114,7 @@ class TestStrategyManager(unittest.TestCase):
         self.strategy_manager.can_operate = MagicMock(return_value= True)
 
         user = User()
-        op = Operation("ABCD", volume=1, timeframe=2, buy=True, sell=True, enable=True)
+        op = Operation("ABCD", volume=1, timeframe=2, can_buy=True, can_sell=True, enable=True)
         strategy = MinMaxStrategy()
         user.add_operation(op)
         user.add_strategy(strategy)
