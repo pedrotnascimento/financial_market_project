@@ -1,6 +1,6 @@
 import unittest
 
-from my_jupyteruser import User
+from my_jupyter.user import User
 
 
 class TestUser(unittest.TestCase):

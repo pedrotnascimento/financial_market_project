@@ -1,9 +1,9 @@
 import unittest
 from  unittest.mock import MagicMock
-from operation import Operation
-from strategies.min_max_strategy import MinMaxStrategy
-from strategy_manager import StrategyManager
-from user import User
+from my_jupyter.operation import Operation
+from my_jupyter.strategies.min_max_strategy import MinMaxStrategy
+from my_jupyter.strategy_manager import StrategyManager
+from my_jupyter.user import User
 
 class MarketDataRepoStub():
     def read_data(self, *args):
@@ -13,6 +13,9 @@ class MarketDataRepoStub():
         return True
     def sell(self, *args):
         return True
+    
+    def positions(self, stock):
+        return []
 
 
 class TestStrategyManager(unittest.TestCase):
@@ -27,7 +30,7 @@ class TestStrategyManager(unittest.TestCase):
     def test_should_add_order_buy(self):
         # arrange
         market_data = MarketDataRepoStub()
-        bull_values = {'low':[2,3,4], 'open':[3,4,5],'close':[4,5,6],'high':[5,6,7]}
+        bull_values = {'low':[2,3,4], 'open':[3,4,5],'close':[2,5,6],'high':[5,6,7]}
         market_data.read_data = MagicMock(return_value =bull_values)
         market_data.buy = MagicMock()
         market_data.sell = MagicMock()

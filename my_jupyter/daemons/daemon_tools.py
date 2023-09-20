@@ -82,7 +82,7 @@ class DaemonThreadMini(threading.Thread):
             self.job_to_execute(**self.kwargs)
             # if alerta_tempo:
             #     Mbox.Alerta("SINAIS ATUALIZADOS", "OK")
-            print("SINAIS ATUALIZADOS")
+            # print("SINAIS ATUALIZADOS")
 
     def wait_until_finish_cycle(self):
         remaining_time_to_reset = self.get_remaining_time()
