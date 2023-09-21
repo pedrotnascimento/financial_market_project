@@ -1,5 +1,8 @@
 from my_jupyter.tools.Mbox import Mbox
 from my_jupyter.metatrader_wrapper import MetatraderWrapper
+from datetime import timedelta as td, datetime as dt
+import pandas as pd
+import numpy as np
 
 
 class MarketDataRepository:
@@ -24,7 +27,7 @@ class MarketDataRepository:
         order = {
             "action": self.mt.TRADE_ACTION_DEAL,
             "symbol": stock,
-            "volume": float(volume/1.0),
+            "volume": float(volume / 1.0),
             "type": self.mt.ORDER_TYPE_BUY,
             "price": close_price,
             "deviation": 10,
@@ -47,7 +50,7 @@ class MarketDataRepository:
         order = {
             "action": self.mt.TRADE_ACTION_DEAL,
             "symbol": stock,
-            "volume": float(volume/1.0),
+            "volume": float(volume / 1.0),
             "type": self.mt.ORDER_TYPE_SELL,
             "price": close_price,
             "deviation": 10,
@@ -67,7 +70,6 @@ class MarketDataRepository:
     def positions(self, stock):
         posicoes = self.mt.positions_get(symbol=stock)
         return posicoes
-
 
     def enviar_solicitacao_ao_homebroker(self, request):
         print(
@@ -100,5 +102,16 @@ class MarketDataRepository:
             return False
         return True
 
+    def read_ticks_from_last_seconds(self, stock, seconds=60):
+        utc_time = 3
+        td_ = td(hours=utc_time, seconds=seconds)
+        now = dt.now()
+        nexti = now - td_
+        ticks = self.mt.copy_ticks_range(stock, nexti, now, self.mt.COPY_TICKS_ALL)
+        ticks_frame = pd.DataFrame(ticks)
+        nanoseconds_in_miliseconds = 10000
+        ticks_time_in_miliseconds = ticks_frame["time_msc"] / nanoseconds_in_miliseconds
+        ticks_frame["time"] = pd.to_datetime(ticks_time_in_miliseconds, unit="s")
+        return ticks_frame
 
-# rico_prod = "C:\\Program Files\\Rico - MetaTrader 5\\terminal64.exe"
+        # rico_prod = "C:\\Program Files\\Rico - MetaTrader 5\\terminal64.exe"

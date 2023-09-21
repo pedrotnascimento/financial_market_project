@@ -6,8 +6,10 @@
 - features:
  - sell_finish and buy_finish methods on strategy
  - strategies:
-    - volume rate -> go with the flow 
+    - [V] volume rate -> go with the flow
         - (the problem its not the small fish, but the big ones, and the big ones only attack when there is no small fish)
+    - [V] consequents bars
+        - map stocks that are actually trending real consequent bars
     - trade heatmaps on prices by bar and by absolute time window.
  - filters of trading
  - alert on entering, finishing and on signal
