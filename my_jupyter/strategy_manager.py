@@ -47,15 +47,16 @@ class StrategyManager:
         ohlc = self.market_data.read_data(
             operation.stock, operation.timeframe, strategy.candles_range + 1
         )
-        if operation.can_buy and strategy.check_buy_signal(ohlc):
-            Mbox.BoxOkCancelAsync(
+        if strategy.check_buy_signal(ohlc):
+            if operation.watch_for_buy:
+                Mbox.BoxOkCancelAsync(
                     "Buy signal",
                     f"Stock:{operation.stock} Strat:{strategy} Vol:{operation.volume}",
-            )
-            ret = self.market_data.buy(operation.stock, operation.volume)
-                
+                )
+            if operation.can_buy:
+                ret = self.market_data.buy(operation.stock, operation.volume)
 
-    def sell_operate(self, operation, strategy):
+    def sell_operate(self, operation: Operation, strategy: StrategyBase):
         positions = self.market_data.positions(operation.stock)
         positions_sell = list(filter(lambda x: x.type != 0, positions))
         if len(positions_sell) > 0:
@@ -63,9 +64,11 @@ class StrategyManager:
         ohlc = self.market_data.read_data(
             operation.stock, operation.timeframe, strategy.candles_range
         )
-        if operation.can_sell and strategy.check_sell_signal(ohlc):          
-            Mbox.BoxOkCancelAsync(
-                "Comprado",
-                f"Stock:{operation.stock} Strat:{strategy} Vol:{operation.volume}",
-            )
-            ret = self.market_data.sell(operation.stock, operation.volume)
+        if strategy.check_sell_signal(ohlc):
+            if operation.watch_for_sell:
+                Mbox.BoxOkCancelAsync(
+                    "Sell Signal",
+                    f"Stock:{operation.stock} Strat:{strategy} Vol:{operation.volume}",
+                )
+            if operation.can_sell:
+                ret = self.market_data.sell(operation.stock, operation.volume)
