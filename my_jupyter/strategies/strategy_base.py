@@ -3,7 +3,9 @@ from my_jupyter.filters.moving_average import MovingAverageFilter
 
 
 class StrategyBase:
-    def __init__(self, filters: list[FilterBase] = None):
+    def __init__(self, period=1,filters: list[FilterBase] = None):
+        candles_needed_filter = [i.candles_needed for i in filters]
+        self.candles_needed = max([period] + candles_needed_filter)
         if filters is not None:
             self.filters = filters
 

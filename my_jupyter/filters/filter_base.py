@@ -1,5 +1,6 @@
 class FilterBase:
-    def __init__(self):
+    def __init__(self, period):
+        self.candles_needed = period
         pass
 
     def ok_to_buy(self, ohlc):

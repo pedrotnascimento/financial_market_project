@@ -1,15 +1,15 @@
+from my_jupyter.filters.filter_base import FilterBase
 from my_jupyter.filters.moving_average import MovingAverageFilter
 from my_jupyter.strategies.strategy_base import StrategyBase
 
 
 class MinMaxStrategy(StrategyBase):
-    def __init__(self, candles_range=2, filters: list[MovingAverageFilter] = None):
-        super().__init__(filters)
-
-        self.candles_range = candles_range
+    def __init__(self, period=2, filters: list[FilterBase] = None):
+        super().__init__(period, candles_filters=filters)
+        self.period = period
 
     def check_buy_signal(self, ohlc) -> bool:
-        interval = ohlc["low"][1 : self.candles_range + 1]
+        interval = ohlc["low"][1 : self.period + 1]
         lowest_low = min(interval)
 
         if not self.check_filter_for_buy_context():
@@ -20,7 +20,7 @@ class MinMaxStrategy(StrategyBase):
         return False
 
     def check_sell_signal(self, ohlc) -> bool:
-        interval = ohlc["high"][1 : self.candles_range + 1]
+        interval = ohlc["high"][1 : self.period + 1]
         highest_high = max(interval)
 
         if not self.check_filter_for_sell_context():

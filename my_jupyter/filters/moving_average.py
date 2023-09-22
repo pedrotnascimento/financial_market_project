@@ -1,8 +1,10 @@
+from my_jupyter.filters.filter_base import FilterBase
 from my_jupyter.indicator.moving_average import MovingAverage
 
 
-class MovingAverageFilter:
+class MovingAverageFilter(FilterBase):
     def __init__(self, period=21):
+        super().__init__(period)
         self.moving_average = MovingAverage(period)
 
     def is_going_up(self, ohlc):

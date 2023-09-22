@@ -2,7 +2,7 @@ from datetime import datetime
 from my_jupyter.market_data_repository import MarketDataRepository
 from my_jupyter.operation import Operation
 from my_jupyter.strategies.strategy_base import StrategyBase
-from my_jupyter.tools.alert_module import Mbox
+from my_jupyter.modules.alert_module import Mbox
 from my_jupyter.user import User
 
 
@@ -45,7 +45,7 @@ class StrategyManager:
         if len(positions_buy) > 0:
             return
         ohlc = self.market_data.read_data(
-            operation.stock, operation.timeframe, strategy.candles_range + 1
+            operation.stock, operation.timeframe, strategy.candles_needed + 1
         )
         if strategy.check_buy_signal(ohlc):
             if operation.watch_for_buy:
@@ -62,7 +62,7 @@ class StrategyManager:
         if len(positions_sell) > 0:
             return
         ohlc = self.market_data.read_data(
-            operation.stock, operation.timeframe, strategy.candles_range
+            operation.stock, operation.timeframe, strategy.candles_needed
         )
         if strategy.check_sell_signal(ohlc):
             if operation.watch_for_sell:
