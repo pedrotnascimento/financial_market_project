@@ -17,3 +17,10 @@
  - backtest
  - expose interface(api) to commands actions to trade
  
+ - modules to be constructed:
+    - filtering module [V]
+    - filters [V]
+    - alerts module [V]
+    - statistical module[V]
+    - plot module
+    - backtest

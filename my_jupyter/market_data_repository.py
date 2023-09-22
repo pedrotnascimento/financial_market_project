@@ -1,4 +1,4 @@
-from my_jupyter.tools.Mbox import Mbox
+from my_jupyter.tools.alert_module import Mbox
 from my_jupyter.metatrader_wrapper import MetatraderWrapper
 from datetime import timedelta as td, datetime as dt
 import pandas as pd
@@ -34,9 +34,7 @@ class MarketDataRepository:
             "magic": 1618,
             "comment": f"{stock} {volume}",
         }
-        # option = Mbox.BoxOkCancel("ENVIAR ORDEM", f"Buy {stock} {volume} {close_price}")
-        # if option == Mbox.CANCELADO:
-        #     return
+
         res = self.enviar_solicitacao_ao_homebroker(order)
         # if res:
         #     self.printing.printa_para_excel(ordem)
@@ -57,9 +55,6 @@ class MarketDataRepository:
             "magic": 1618,
             "comment": f"{stock} {volume}",
         }
-        # option = Mbox.BoxOkCancel("ENVIAR ORDEM", f"Buy {stock} {volume} {close_price}")
-        # if option == Mbox.CANCELADO:
-        #     return
         res = self.enviar_solicitacao_ao_homebroker(order)
         # if res:
         #     self.printing.printa_para_excel(ordem)
@@ -113,5 +108,3 @@ class MarketDataRepository:
         ticks_time_in_miliseconds = ticks_frame["time_msc"] / nanoseconds_in_miliseconds
         ticks_frame["time"] = pd.to_datetime(ticks_time_in_miliseconds, unit="s")
         return ticks_frame
-
-        # rico_prod = "C:\\Program Files\\Rico - MetaTrader 5\\terminal64.exe"

@@ -1,6 +1,8 @@
 from datetime import datetime
 from my_jupyter.market_data_repository import MarketDataRepository
 from my_jupyter.operation import Operation
+from my_jupyter.strategies.strategy_base import StrategyBase
+from my_jupyter.tools.alert_module import Mbox
 from my_jupyter.user import User
 
 
@@ -37,7 +39,7 @@ class StrategyManager:
             for s in self.user.strategies:
                 operate(o, s)
 
-    def buy_operate(self, operation: Operation, strategy):
+    def buy_operate(self, operation: Operation, strategy: StrategyBase):
         positions = self.market_data.positions(operation.stock)
         positions_buy = list(filter(lambda x: x.type == 0, positions))
         if len(positions_buy) > 0:
@@ -48,6 +50,11 @@ class StrategyManager:
         if operation.can_buy and strategy.check_buy_signal(ohlc):
             print("buying")
             ret = self.market_data.buy(operation.stock, operation.volume)
+            if ret:
+                Mbox.BoxOkCancelAsync(
+                    "Comprado",
+                    f"Stock:{operation.stock} Strat:{strategy} Vol:{operation.volume}",
+                )
 
     def sell_operate(self, operation, strategy):
         positions = self.market_data.positions(operation.stock)
@@ -60,3 +67,8 @@ class StrategyManager:
         if operation.can_sell and strategy.check_sell_signal(ohlc):
             print("selling")
             ret = self.market_data.sell(operation.stock, operation.volume)
+            if ret:
+                Mbox.BoxOkCancelAsync(
+                    "Comprado",
+                    f"Stock:{operation.stock} Strat:{strategy} Vol:{operation.volume}",
+                )
