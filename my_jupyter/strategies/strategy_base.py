@@ -13,6 +13,7 @@ class StrategyBase:
         for f in self.filters:
             if f.ok_to_buy(ohlc) is False:
                 return False
+        return True
 
     def check_buy_signal(self, ohlc) -> bool:
         pass
@@ -21,6 +22,6 @@ class StrategyBase:
         for f in self.filters:
             if f.ok_to_sell(ohlc) is False:
                 return False
-
+        return True
     def check_sell_signal(self, ohlc) -> bool:
         pass

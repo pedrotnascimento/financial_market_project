@@ -11,12 +11,12 @@ class CountConsequentBarsReversal:
         i = 0
         try:
             while i < len(ohlc) - 3:
-                if ohlc[i]["low"] <= ohlc[i + 1]["low"]:
-                    while ohlc[i]["low"] <= ohlc[i + 1]["low"]:
+                if ohlc[i]["high"] <= ohlc[i + 1]["high"]:
+                    while ohlc[i]["high"] <= ohlc[i + 1]["high"]:
                         i += 1
                         count += 1
-                elif ohlc[i]["high"] >= ohlc[i + 1]["high"]:
-                    while ohlc[i]["high"] >= ohlc[i + 1]["high"]:
+                elif ohlc[i]["low"] >= ohlc[i + 1]["low"]:
+                    while ohlc[i]["low"] >= ohlc[i + 1]["low"]:
                         i += 1
                         count += 1
                 i += 1

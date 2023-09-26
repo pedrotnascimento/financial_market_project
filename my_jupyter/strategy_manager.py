@@ -48,6 +48,7 @@ class StrategyManager:
             operation.stock, operation.timeframe, strategy.candles_needed + 1
         )
         if strategy.check_buy_signal(ohlc):
+            print("buy")
             if operation.watch_for_buy:
                 Mbox.BoxOkCancelAsync(
                     "Buy signal",
@@ -62,9 +63,10 @@ class StrategyManager:
         if len(positions_sell) > 0:
             return
         ohlc = self.market_data.read_data(
-            operation.stock, operation.timeframe, strategy.candles_needed
+            operation.stock, operation.timeframe, strategy.candles_needed+1
         )
         if strategy.check_sell_signal(ohlc):
+            print("sell")
             if operation.watch_for_sell:
                 Mbox.BoxOkCancelAsync(
                     "Sell Signal",

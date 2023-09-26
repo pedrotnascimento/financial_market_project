@@ -1,4 +1,4 @@
-from my_jupyter.tools.alert_module import Mbox
+from my_jupyter.modules.alert_module import Mbox
 from my_jupyter.metatrader_wrapper import MetatraderWrapper
 from datetime import timedelta as td, datetime as dt
 import pandas as pd

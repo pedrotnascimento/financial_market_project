@@ -1,3 +1,4 @@
+import pandas as pd
 from my_jupyter.indicator.indicator_base import IndicatorBase
 
 
@@ -8,5 +9,6 @@ class MovingAverage(IndicatorBase):
 
     def get(self, ohlc):
         closes = ohlc["close"]
-        closes_mean = closes.rolling(self.period).mean()
-        return closes_mean
+        closes_pd  =pd.Series(closes)
+        closes_mean = closes_pd.rolling(self.period).mean().dropna()
+        return closes_mean.values

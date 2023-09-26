@@ -10,6 +10,7 @@ class ConsequentLimitsCounterFilter(FilterBase):
 
     def is_going_up(self, ohlc):
         o = self.candle_counter.output(ohlc)
+        
         if o >= self.period:
             return True
         return False
@@ -17,7 +18,7 @@ class ConsequentLimitsCounterFilter(FilterBase):
     def is_going_down(self, ohlc):
         o = self.candle_counter.output(ohlc)
         period_neg = -self.period
-        if o <= -period_neg:
+        if o <= period_neg:
             return True
         return False
 
