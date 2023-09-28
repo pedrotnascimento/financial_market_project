@@ -1,7 +1,7 @@
 from my_jupyter.indicator.indicator_base import IndicatorBase
 
 
-class ConsequentLimitsCounterIndicator(IndicatorBase):
+class DirectionedBarsCounterIndicator(IndicatorBase):
     def __init__(self, period):
         super().__init__(period + 1)
         self.period = period
@@ -41,12 +41,19 @@ class ConsequentLimitsCounterIndicator(IndicatorBase):
     def next_inx(self):
         self.inx += 1
 
+    def is_bear_bar(self):
+        return (
+            self.ohlc_previous["close"][self.inx] < self.ohlc_previous["open"][self.inx]
+        )
+
     def is_bear_first_moviment(self):
-        return self.is_range_not_reached() and (self.is_high_lower_than_previous_high())
+        return self.is_range_not_reached() and (
+            self.is_bear_bar() or self.is_high_lower_than_previous_high()
+        )
 
     def is_bear_moviment(self):
         return self.is_range_not_reached() and (
-            self.is_high_lower_or_equal_than_previous_high()
+            self.is_bear_bar() or self.is_high_lower_or_equal_than_previous_high()
         )
 
     def is_high_lower_than_previous_high(self):
@@ -61,13 +68,19 @@ class ConsequentLimitsCounterIndicator(IndicatorBase):
             <= self.ohlc_previous["high"][self.inx + 1]
         )
 
+    def is_bull_bar(self):
+        return (
+            self.ohlc_previous["close"][self.inx] > self.ohlc_previous["open"][self.inx]
+        )
+
     def is_bull_first_moviment(self):
-        return self.is_range_not_reached() and (self.is_low_higher_than_previous_low())
+        return self.is_range_not_reached() and (
+            self.is_bull_bar() or self.is_low_higher_than_previous_low()
+        )
 
     def is_bull_moviment(self):
         return self.is_range_not_reached() and (
-            self.is_low_higher_than_previous_low()
-            or self.is_low_higher_or_equal_than_previous_low()
+            self.is_bull_bar() or self.is_low_higher_or_equal_than_previous_low()
         )
 
     def is_low_higher_than_previous_low(self):

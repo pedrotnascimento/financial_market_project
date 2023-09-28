@@ -25,3 +25,8 @@ class StrategyBase:
         return True
     def check_sell_signal(self, ohlc) -> bool:
         pass
+
+    def buy_close(self, ohlc):
+        pass
+    def sell_close(self, ohlc):
+        pass

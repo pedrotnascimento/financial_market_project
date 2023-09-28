@@ -35,7 +35,7 @@ class User:
         if trading_time_end:
             self.trading_time_end = trading_time_end
         else:
-            end = datetime(now.year, now.month, now.day, 16, 35)
+            end = datetime(now.year, now.month, now.day, 23, 35)
             self.trading_time_end = end
 
         self.risk_money = risk_money
