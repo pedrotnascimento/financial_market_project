@@ -24,7 +24,6 @@ class DirectionedBarsCounterIndicator(IndicatorBase):
                     self.next_inx()
                     count += 1
 
-            print(f"counting: {count}")
             return count
         except Exception as e:
             print(self.i, len(ohlc))
