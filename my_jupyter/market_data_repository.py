@@ -40,7 +40,7 @@ class MarketDataRepository:
         #     self.printing.printa_para_excel(ordem)
         #     return True
         self.last_response_from_homebroker = res
-        return False
+        return res
 
     def sell(self, stock, volume):
         current_bar = self.mt.copy_rates_from_pos(stock, self.mt.TIMEFRAME_D1, 0, 1)
@@ -60,7 +60,7 @@ class MarketDataRepository:
         #     self.printing.printa_para_excel(ordem)
         #     return True
         self.last_response_from_homebroker = res
-        return False
+        return res
 
     def positions(self, stock):
         posicoes = self.mt.positions_get(symbol=stock)
@@ -102,6 +102,18 @@ class MarketDataRepository:
         td_ = td(hours=utc_time, seconds=seconds)
         now = dt.now()
         nexti = now - td_
+        ticks = self.mt.copy_ticks_range(stock, nexti, now, self.mt.COPY_TICKS_ALL)
+        ticks_frame = pd.DataFrame(ticks)
+        nanoseconds_in_miliseconds = 10000
+        ticks_time_in_miliseconds = ticks_frame["time_msc"] / nanoseconds_in_miliseconds
+        ticks_frame["time"] = pd.to_datetime(ticks_time_in_miliseconds, unit="s")
+        return ticks_frame
+    
+    def read_ticks_from_to(self, stock, dt_from, dt_to):
+        utc_time = 3
+        td_ = td(hours=utc_time)
+        now = dt_from
+        nexti = dt_to
         ticks = self.mt.copy_ticks_range(stock, nexti, now, self.mt.COPY_TICKS_ALL)
         ticks_frame = pd.DataFrame(ticks)
         nanoseconds_in_miliseconds = 10000

@@ -7,6 +7,8 @@
     - [&#10004;]sell_finish and buy_finish methods on strategy
     - strategies:
         - [ ] volume integral -> sum of the volume rate watching for buy and sells
+        - [ ] operate doji in trends
+        - [ ] operate average pullback
         - [&#10004;] volume rate -> go with the flow
             - (the problem its not the small fish, but the big ones, and the big ones only attack when there is no small fish)
         - [&#10004;] consequents bars
