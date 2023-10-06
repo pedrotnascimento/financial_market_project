@@ -8,6 +8,7 @@ class DirectionedBarsCounterIndicator(IndicatorBase):
 
     def output(self, ohlc):
         count = 0
+        # past candles, only closed ones
         previous_candles = 1
         try:
             ohlc_previous = ohlc[previous_candles:]
@@ -26,7 +27,6 @@ class DirectionedBarsCounterIndicator(IndicatorBase):
 
             return count
         except Exception as e:
-            print(self.i, len(ohlc))
             print(e)
 
     def set_init(self, ohlc_previous):
@@ -42,7 +42,8 @@ class DirectionedBarsCounterIndicator(IndicatorBase):
 
     def is_bear_bar(self):
         return (
-            self.ohlc_previous["close"][self.inx] < self.ohlc_previous["open"][self.inx]
+            self.ohlc_previous["close"].iloc[self.inx]
+            < self.ohlc_previous["open"].iloc[self.inx]
         )
 
     def is_bear_first_moviment(self):
@@ -57,19 +58,20 @@ class DirectionedBarsCounterIndicator(IndicatorBase):
 
     def is_high_lower_than_previous_high(self):
         return (
-            self.ohlc_previous["high"][self.inx]
-            < self.ohlc_previous["high"][self.inx + 1]
+            self.ohlc_previous["high"].iloc[self.inx]
+            < self.ohlc_previous["high"].iloc[self.inx + 1]
         )
 
     def is_high_lower_or_equal_than_previous_high(self):
         return (
-            self.ohlc_previous["high"][self.inx]
-            <= self.ohlc_previous["high"][self.inx + 1]
+            self.ohlc_previous["high"].iloc[self.inx]
+            <= self.ohlc_previous["high"].iloc[self.inx + 1]
         )
 
     def is_bull_bar(self):
         return (
-            self.ohlc_previous["close"][self.inx] > self.ohlc_previous["open"][self.inx]
+            self.ohlc_previous["close"].iloc[self.inx]
+            > self.ohlc_previous["open"].iloc[self.inx]
         )
 
     def is_bull_first_moviment(self):
@@ -84,12 +86,12 @@ class DirectionedBarsCounterIndicator(IndicatorBase):
 
     def is_low_higher_than_previous_low(self):
         return (
-            self.ohlc_previous["low"][self.inx]
-            < self.ohlc_previous["low"][self.inx + 1]
+            self.ohlc_previous["low"].iloc[self.inx]
+            < self.ohlc_previous["low"].iloc[self.inx + 1]
         )
 
     def is_low_higher_or_equal_than_previous_low(self):
         return (
-            self.ohlc_previous["low"][self.inx]
-            <= self.ohlc_previous["low"][self.inx + 1]
+            self.ohlc_previous["low"].iloc[self.inx]
+            <= self.ohlc_previous["low"].iloc[self.inx + 1]
         )

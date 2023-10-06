@@ -38,7 +38,6 @@ class MinMaxStrategy(StrategyBase):
     def sell_close(self, ohlc):
         interval = ohlc["low"][1 : self.period + 1]
         lowest_low = min(interval)
-        print(ohlc["close"][0] < lowest_low, ohlc["close"][0], lowest_low)
         if ohlc["close"][0] < lowest_low:
             return True
         return False
