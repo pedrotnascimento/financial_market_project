@@ -92,9 +92,11 @@ class BarsTrendQualityML:
         qntOfBuys = len(data.loc[data["act"] == 2])
         qntOfSells = len(data.loc[data["act"] == 0])
         least_data = min(qntOfBuys, qntOfSells)
-        indexRemove = data.loc[data["act"] == 0].index[least_data + 2 :]
+        indexRemove = data.loc[data["act"] == 0].index[least_data-1:]
         data.drop(indexRemove, inplace=True)
-        indexRemove = data.loc[data["act"] == 1].index[least_data + 2 :]
+        indexRemove = data.loc[data["act"] == 1].index[least_data-1:]
+        data.drop(indexRemove, inplace=True)
+        indexRemove = data.loc[data["act"] == 2].index[least_data-1:]
         data.drop(indexRemove, inplace=True)
         print(qntOfBuys, qntOfSells)
         return data

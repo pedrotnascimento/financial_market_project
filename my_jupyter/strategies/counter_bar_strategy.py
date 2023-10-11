@@ -1,4 +1,4 @@
-from my_jupyter.filters import consequent_closing_filter
+from my_jupyter.filters.consequent_closing_filter import ConsequentClosingFilter
 from my_jupyter.filters.directioned_bars_filter import DirectionedBarsFilter
 from my_jupyter.filters.filter_base import FilterBase
 from my_jupyter.indicator import directioned_bars_counter
@@ -8,7 +8,7 @@ from my_jupyter.strategies.strategy_base import StrategyBase
 class CounterBarStrategy(StrategyBase):
     def __init__(self, period=5, filters: list[FilterBase] = None):
         # filters = [DirectionedBarsFilter(candles=5)]
-        filters = [consequent_closing_filter.ConsequentClosingFilter(candles=5)]
+        filters = [ConsequentClosingFilter(candles=5)]
         super().__init__(period + 1, filters=filters)
         self.period = period
 

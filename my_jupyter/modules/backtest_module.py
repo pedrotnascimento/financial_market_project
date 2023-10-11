@@ -119,7 +119,7 @@ class BacktestStrategyModule(Strategy):
         inx_label = "close"
         inx_ = 3
         try:
-            for j in range(1, 6):
+            for j in range(5, 0,-1):
                 if not f"{inx_label}-{j}" in self.output_data:
                     self.output_data[f"{inx_label}-{j}"] = []
                 self.output_data[f"{inx_label}-{j}"].append(self.ohlc_custom[j][inx_])
