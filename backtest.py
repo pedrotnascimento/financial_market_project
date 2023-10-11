@@ -44,18 +44,16 @@ class SmaCross(Strategy):
         if self.position.is_long:
             if self.min_max.buy_close(ohlc):
                 self.position.close()
-                return
             return
         elif self.position.is_short:
             if self.min_max.sell_close(ohlc):
                 self.position.close()
-                return
             return
 
         if self.min_max.check_buy_signal(ohlc):
-            a = self.buy(size=1)
+            a = self.buy()
         elif self.min_max.check_sell_signal(ohlc):
-            a = self.sell(size=1)
+            a = self.sell()
 
 
 bt = Backtest(WINV23M1, SmaCross, commission=0.002, exclusive_orders=True, cash=10**12)
