@@ -139,6 +139,7 @@ class BacktestStrategyModule(Strategy):
             leng = len(df_out)
             for i in range(0,leng):
                 curr = df_out.iloc[i]
+                curr_min = min(curr)
                 # act = df_in.iloc[i]["act"]
                 # if act==2:
                 #     curr_min = min(curr)
