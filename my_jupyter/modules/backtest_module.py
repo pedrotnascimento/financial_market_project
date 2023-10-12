@@ -56,7 +56,7 @@ class BacktestModule:
         dataframe = pd.DataFrame(data_nparray).rename(
             columns={"close": "Close", "open": "Open", "high": "High", "low": "Low"}
         )
-        dataframe.drop("time",axis=1, inplace=True)
+        dataframe.drop("time", axis=1, inplace=True)
         # dataframe.set_index("time")
         # dataset = _read_file("dataset\WINV23.csv")
 
@@ -125,7 +125,7 @@ class BacktestStrategyModule(Strategy):
                 self.output_data[f"{inx_label}-{j}"].append(self.ohlc_custom[j][inx_])
         except Exception as e:
             print(e)
-            print("ERRO>>>",self.ohlc_custom)
+            print("ERRO>>>", self.ohlc_custom)
             return
         self.output_data[f"act"].append(acao)
         self.output_data[f"index"].append(self.count)
@@ -133,21 +133,43 @@ class BacktestStrategyModule(Strategy):
 
     def get_result_for_ia(self):
         df_out_IA_tensor_flow = pd.DataFrame.from_dict(self.output_data)
+
         def normalize(df_in):
             df_out = df_in.drop("act", axis=1)
             df_out = df_out.drop("index", axis=1)
             leng = len(df_out)
 
-            for i in range(0,leng):
+            for i in range(0, leng):
                 curr = df_out.iloc[i]
                 # curr_min = min(curr)
                 curr_min = curr[-1]
-                
+
                 df_out.iloc[i] = curr_min - df_out.iloc[i]
             for col in df_out:
                 df_in[col] = df_out[col]
             df_out = df_in
             return df_out
+
         df_out_IA_normalized = normalize(df_out_IA_tensor_flow)
-                
-        return df_out_IA_normalized
+        df_filtered = self._process_dataframe(df_out_IA_normalized)
+
+        return df_filtered
+
+    def _process_dataframe(self, data):
+        data.drop("index", axis=1, inplace=True)
+        # data.drop("Unnamed: 0", axis=1, inplace=True)
+        # data.drop("counting_bar", axis=1, inplace=True)
+        # data.drop("close-0", axis=1, inplace=True)
+        # data.drop("date", axis=1, inplace=True)
+
+        qntOfBuys = len(data.loc[data["act"] == 2])
+        qntOfSells = len(data.loc[data["act"] == 0])
+        least_data = min(qntOfBuys, qntOfSells)
+        indexRemove = data.loc[data["act"] == 0].index[least_data - 1 :]
+        data.drop(indexRemove, inplace=True)
+        indexRemove = data.loc[data["act"] == 1].index[least_data - 1 :]
+        data.drop(indexRemove, inplace=True)
+        indexRemove = data.loc[data["act"] == 2].index[least_data - 1 :]
+        data.drop(indexRemove, inplace=True)
+        print(qntOfBuys, qntOfSells)
+        return data
