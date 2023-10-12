@@ -119,7 +119,7 @@ class BacktestStrategyModule(Strategy):
         inx_label = "close"
         inx_ = 3
         try:
-            for j in range(5, 0,-1):
+            for j in range(1, 6):
                 if not f"{inx_label}-{j}" in self.output_data:
                     self.output_data[f"{inx_label}-{j}"] = []
                 self.output_data[f"{inx_label}-{j}"].append(self.ohlc_custom[j][inx_])
@@ -137,17 +137,13 @@ class BacktestStrategyModule(Strategy):
             df_out = df_in.drop("act", axis=1)
             df_out = df_out.drop("index", axis=1)
             leng = len(df_out)
+
             for i in range(0,leng):
                 curr = df_out.iloc[i]
-                curr_min = min(curr)
-                # act = df_in.iloc[i]["act"]
-                # if act==2:
-                #     curr_min = min(curr)
-                # elif act==0:
-                #     curr_min = max(curr)
-                # else:
-
-                df_out.iloc[i] = df_out.iloc[i] - curr_min
+                # curr_min = min(curr)
+                curr_min = curr[-1]
+                
+                df_out.iloc[i] = curr_min - df_out.iloc[i]
             for col in df_out:
                 df_in[col] = df_out[col]
             df_out = df_in

@@ -53,15 +53,19 @@ class CountConsequentBarsReversal:
                 f"{sort_counting[a][0]}X{sort_counting[a+1][0]}",
                 sort_counting[a][1] / sort_counting[a + 1][1],
             )
-            for a in range(8)
+            for a in range(len(sort_counting)-1)
         ]
         average_of_rate = sum([i[1] for i in rates_of_frequency]) / len(
             rates_of_frequency
         )
         average_of_leg = sum([i[1] for i in sort_counting]) / len(sort_counting)
+        sum_all = sum([i[1] for i in sort_counting])
+        probababilities  = [ (i, j/sum_all) for i,j in sort_counting]
+
 
         if display_statistic:
             print(f"generate statistic for bars reversal in {self.period} bar")
+            print("probabilities", probababilities)
             print("quantity of consequent reversals", *sort_counting)
             print("rate from current level to next of consequent reversals", *rates_of_frequency)
             print("average of rate", average_of_rate)
