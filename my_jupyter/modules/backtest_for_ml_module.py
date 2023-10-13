@@ -18,7 +18,14 @@ class BacktestForMLModule:
     def __init__(self, strategy: StrategyBase):
         self.strategy = strategy
 
-    def run_bt(self, from_file="", from_stock_market_data=None, **kwargs):
+    def run_bt(
+        self,
+        from_file="",
+        from_stock_market_data=None,
+        quantity_previous_bar=5,
+        take_action=None,
+        **kwargs,
+    ):
         data = None
         if from_file != "":
             data = self._read_file(from_file)
@@ -34,7 +41,14 @@ class BacktestForMLModule:
             cash=10**12,
         )
         output_data = {"index": [], "act": []}
-        bt._strategy.set_custom_strategy(bt._strategy, self.strategy, output_data)
+
+        bt._strategy.set_custom_strategy(
+            bt._strategy,
+            self.strategy,
+            output_data,
+            quantity_previous_bar,
+            take_action=take_action,
+        )
         stats = bt.run()
         self.bt = bt
         self.strategy_in_test = strategy_in_test
@@ -53,7 +67,7 @@ class BacktestForMLModule:
         mt_rep = MarketDataRepository()
         data_nparray = mt_rep.read_data(
             stock, mt_rep.mt.TIMEFRAME_M1, 10**quantity_of_bars_in_thousands - 1
-        )
+        )[240:]
         self.stock = stock
         dataframe = pd.DataFrame(data_nparray).rename(
             columns={"close": "Close", "open": "Open", "high": "High", "low": "Low"}
@@ -89,9 +103,17 @@ class BacktestStrategyModule(Strategy):
         self.ohlc_custom = []
         self.count = -1  ## delaying 2 before to sync with counting
 
-    def set_custom_strategy(self, strategy: StrategyBase, output_data):
+    def set_custom_strategy(
+        self,
+        strategy: StrategyBase,
+        output_data,
+        quantity_previous_bar=5,
+        take_action=[],
+    ):
         self.strategy = strategy
         self.output_data = output_data
+        self.quantity_previous_bar = quantity_previous_bar
+        self.take_action = take_action
 
     def next(self):
         self.count += 1
@@ -132,12 +154,12 @@ class BacktestStrategyModule(Strategy):
 
         self.insert_data_to_ml_input(act)
 
-    def insert_data_to_ml_input(
-        self, acao, labels_dict={"close": 3}, quantity_previous_bar=5, skip=1
-    ):
+    def insert_data_to_ml_input(self, acao, labels_dict={"close": 3}, skip=1):
+        # if  acao not in self.take_action:
+        #     return
         for key, inx_ in labels_dict.items():
             try:
-                for j in range(skip, quantity_previous_bar + 1):
+                for j in range(skip, self.quantity_previous_bar + 1):
                     if not f"{key}-{j}" in self.output_data:
                         self.output_data[f"{key}-{j}"] = []
                     self.output_data[f"{key}-{j}"].append(self.ohlc_custom[j][inx_])
@@ -177,10 +199,12 @@ class BacktestStrategyModule(Strategy):
                 remain_data_at_least - 1 :
             ]
             data.drop(indexRemove, inplace=True)
+
             indexRemove = data.loc[data["act"] == EnumAct.WAIT].index[
                 remain_data_at_least - 1 :
             ]
             data.drop(indexRemove, inplace=True)
+
             indexRemove = data.loc[data["act"] == EnumAct.BUY].index[
                 remain_data_at_least - 1 :
             ]
@@ -209,7 +233,7 @@ class BacktestStrategyModule(Strategy):
         qntOfBuys = len(initial_df.loc[initial_df["act"] == EnumAct.BUY])
         qntOfSells = len(initial_df.loc[initial_df["act"] == EnumAct.SELL])
         qntOfWait = len(initial_df.loc[initial_df["act"] == EnumAct.WAIT])
-        least_data = min(qntOfBuys, qntOfSells)
+        least_data = min(qntOfBuys, qntOfSells, qntOfWait)
         print("before filter", qntOfBuys, qntOfSells, qntOfWait)
 
         initial_df.drop("index", axis=1, inplace=True)
