@@ -24,7 +24,7 @@ WINV23M1 = _read_file('my_jupyter\daemons\dataset\WINV23M1 copy.csv')
 def data(arr):
     return arr.rename(columns={'Close': 'close','High': 'high', 'Low':'low', 'Open':'open'})
 
-class SmaCross(Strategy):
+class MinMaxStrategyBacktest(Strategy):
     def init(self):
         self.min_max = MinMaxStrategy()
         self.ohlc = self.I(data, self.data.df)
@@ -56,6 +56,6 @@ class SmaCross(Strategy):
             a = self.sell()
 
 
-bt = Backtest(WINV23M1, SmaCross, commission=0.002, exclusive_orders=True, cash=10**12)
+bt = Backtest(WINV23M1, MinMaxStrategyBacktest, commission=0.002, exclusive_orders=True, cash=10**12)
 stats = bt.run()
-bt.plot()
+# bt.plot()

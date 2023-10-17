@@ -14,9 +14,9 @@ def data(arr):
     )
 
 
-class BacktestForMLModule:
-    def __init__(self, strategy: StrategyBase):
-        self.strategy = strategy
+class PriceDirectionMLBacktest:
+    def __init__(self):
+        pass
 
     def run_bt(self, from_file="", from_stock_market_data=None, **kwargs):
         data = None
@@ -24,7 +24,7 @@ class BacktestForMLModule:
             data = self._read_file(from_file)
         elif from_stock_market_data is not None:
             data = self.read_market_data(from_stock_market_data, **kwargs)
-        strategy_in_test = BacktestStrategyModule
+        strategy_in_test = PricesDirectionMLBacktestStrategy
 
         bt = Backtest(
             data,
@@ -33,8 +33,8 @@ class BacktestForMLModule:
             exclusive_orders=True,
             cash=10**12,
         )
-        output_data = {"index": [], "act": []}
-        bt._strategy.set_custom_strategy(bt._strategy, self.strategy, output_data)
+        output_data = {"index": []}
+        bt._strategy.set_custom_strategy(bt._strategy, output_data)
         stats = bt.run()
         self.bt = bt
         self.strategy_in_test = strategy_in_test
@@ -59,8 +59,6 @@ class BacktestForMLModule:
             columns={"close": "Close", "open": "Open", "high": "High", "low": "Low"}
         )
         dataframe.drop("time", axis=1, inplace=True)
-        # dataframe.set_index("time")
-        # dataset = _read_file("dataset\WINV23.csv")
 
         return dataframe
 
@@ -75,7 +73,6 @@ class BacktestForMLModule:
 
     def plot_it(self):
         self.bt.plot()
-        
 
 
 class EnumAct:
@@ -84,14 +81,13 @@ class EnumAct:
     WAIT = 1
 
 
-class BacktestStrategyModule(Strategy):
+class PricesDirectionMLBacktestStrategy(Strategy):
     def init(self):
         self.ohlc = self.I(data, self.data.df)
         self.ohlc_custom = []
         self.count = -1  ## delaying 2 before to sync with counting
 
-    def set_custom_strategy(self, strategy: StrategyBase, output_data):
-        self.strategy = strategy
+    def set_custom_strategy(self, output_data):
         self.output_data = output_data
 
     def next(self):
@@ -107,38 +103,15 @@ class BacktestStrategyModule(Strategy):
             return
 
         self.ohlc_custom.pop()
-
-        act = EnumAct.WAIT
-        if self.position.is_long:
-            if self.strategy.buy_close(ohlc):
-                self.position.close()
-            else:
-                act = EnumAct.BUY
-                self.insert_data_to_ml_input(act)
-            return
-        elif self.position.is_short:
-            if self.strategy.sell_close(ohlc):
-                self.position.close()
-            else:
-                act = EnumAct.SELL
-                self.insert_data_to_ml_input(act)
-            return
-
-        if self.strategy.check_buy_signal(ohlc):
-            a = self.buy()
-            act = EnumAct.BUY
-        elif self.strategy.check_sell_signal(ohlc):
-            a = self.sell()
-            act = EnumAct.SELL
-
-        self.insert_data_to_ml_input(act)
+        self.insert_data_to_ml_input(quantity_previous_bar=6)
 
     def insert_data_to_ml_input(
-        self, acao, labels_dict={"close": 3}, quantity_previous_bar=5, skip=1
+        self, labels_dict={"close": 3}, quantity_previous_bar=5, skip=1
     ):
         for key, inx_ in labels_dict.items():
             try:
-                for j in range(skip, quantity_previous_bar + 1):
+                range_ = list(range(skip, quantity_previous_bar + 1))
+                for j in range_[::-1]:
                     if not f"{key}-{j}" in self.output_data:
                         self.output_data[f"{key}-{j}"] = []
                     self.output_data[f"{key}-{j}"].append(self.ohlc_custom[j][inx_])
@@ -146,34 +119,21 @@ class BacktestStrategyModule(Strategy):
                 print(e)
                 print("ERRO>>>", self.ohlc_custom)
                 return
-            self.output_data[f"act"].append(acao)
             self.output_data[f"index"].append(self.count)
         # output_data[f"date"].append(WINV23M1.iloc[self.count].name)
 
     def get_result_for_ia(self):
         def normalize_values_to_rated_values(df_in):
-            df_out = df_in.drop("act", axis=1)
-
-            leng = len(df_out)
-
+            leng = len(df_in)
             for i in range(0, leng):
-                curr = df_out.iloc[i]
-                # curr_min = min(curr)
-                curr_min = curr[-1]
+                curr = df_in.iloc[i]
+                df_in.iloc[i] = curr.diff().cumsum()
 
-                df_out.iloc[i] = curr_min - df_out.iloc[i]
-            for col in df_out:
-                df_in[col] = df_out[col]
-            df_out = df_in
-            return df_out
+            df_in.drop(df_in.columns[0], axis=1, inplace=True)
+
+            return df_in
 
         def normalize_quantity_of_data(data, remain_data_at_least):
-            # data.drop("index", axis=1, inplace=True)
-            # data.drop("Unnamed: 0", axis=1, inplace=True)
-            # data.drop("counting_bar", axis=1, inplace=True)
-            # data.drop("close-0", axis=1, inplace=True)
-            # data.drop("date", axis=1, inplace=True)
-
             indexRemove = data.loc[data["act"] == EnumAct.SELL].index[
                 remain_data_at_least - 1 :
             ]
@@ -190,35 +150,75 @@ class BacktestStrategyModule(Strategy):
             return data
 
         def filter_by_mean_and_std(df):
-            operations = [EnumAct.SELL, EnumAct.WAIT, EnumAct.BUY]
-            for op in operations:
-                mean, std = df[df["act"] == op].mean(), df[df["act"] == op].std()
-                for i in df:
-                    if i == "act":
-                        continue
-                    lower_std = mean[i] - std[i]
-                    upper_std = mean[i] + std[i]
-                    indexRemove = df[
-                        (df["act"] == op) & ((df[i] < lower_std) | (df[i] > upper_std))
-                    ].index
-                    df.drop(indexRemove, inplace=True)
+            # df.drop("index",axis=1,inplace=True)
+            buy_to_be_filtered = df.copy(deep=True)
+            sell_to_be_filtered = df.copy(deep=True)
+            wait_to_be_filtered = df.copy(deep=True)
+            for col in df:
+                mean, std = df[col].mean(), df[col].std()
+                std_rate = std*0.5 
+                upper_std = mean + std_rate
+                lower_std = mean - std_rate
 
-            return df
+                buy_to_be_filtered = buy_to_be_filtered[
+                    (buy_to_be_filtered[col] > (upper_std))
+                ]
+                sell_to_be_filtered = sell_to_be_filtered[
+                    (sell_to_be_filtered[col] < (lower_std))
+                ]
+                wait_to_be_filtered = wait_to_be_filtered[
+                    ((lower_std) < wait_to_be_filtered[col])
+                    & (wait_to_be_filtered[col] < upper_std)
+                ]
+            mean, std = buy_to_be_filtered.mean(), buy_to_be_filtered.std()
+            buy_to_be_filtered = buy_to_be_filtered[buy_to_be_filtered < mean + std]
+            mean, std = sell_to_be_filtered.mean(), sell_to_be_filtered.std()
+            sell_to_be_filtered = sell_to_be_filtered[sell_to_be_filtered > mean - std]
+
+            buy_to_be_filtered["act"] = pd.Series(
+                [EnumAct.BUY] * len(buy_to_be_filtered.values),
+                index=buy_to_be_filtered.index,
+            )
+            sell_to_be_filtered["act"] = pd.Series(
+                [EnumAct.SELL] * len(sell_to_be_filtered.values),
+                index=sell_to_be_filtered.index,
+            )
+            wait_to_be_filtered["act"] = pd.Series(
+                [EnumAct.WAIT] * len(wait_to_be_filtered.values),
+                index=wait_to_be_filtered.index,
+            )
+            buy_to_be_filtered=buy_to_be_filtered.dropna()
+            sell_to_be_filtered=sell_to_be_filtered.dropna()
+            wait_to_be_filtered=wait_to_be_filtered.dropna()
+
+            df_final = pd.concat(
+                [buy_to_be_filtered, sell_to_be_filtered, wait_to_be_filtered], ignore_index=True
+            )
+            return df_final
 
         initial_df = pd.DataFrame.from_dict(self.output_data)
 
-        qntOfBuys = len(initial_df.loc[initial_df["act"] == EnumAct.BUY])
-        qntOfSells = len(initial_df.loc[initial_df["act"] == EnumAct.SELL])
-        qntOfWait = len(initial_df.loc[initial_df["act"] == EnumAct.WAIT])
+        initial_df.drop("index", axis=1, inplace=True)
+        df_out_IA_normalized = normalize_values_to_rated_values(initial_df)
+        df_filtered_by_values = filter_by_mean_and_std(df_out_IA_normalized)
+
+        qntOfBuys = len(
+            df_filtered_by_values.loc[df_filtered_by_values["act"] == EnumAct.BUY]
+        )
+        qntOfSells = len(
+            df_filtered_by_values.loc[df_filtered_by_values["act"] == EnumAct.SELL]
+        )
+        qntOfWait = len(
+            df_filtered_by_values.loc[df_filtered_by_values["act"] == EnumAct.WAIT]
+        )
         least_data = min(qntOfBuys, qntOfSells)
         print("before filter", qntOfBuys, qntOfSells, qntOfWait)
 
-        initial_df.drop("index", axis=1, inplace=True)
-        df_filtered_by_quantity = normalize_quantity_of_data(initial_df, least_data)
-        df_out_IA_normalized = normalize_values_to_rated_values(df_filtered_by_quantity)
-        df_filtered_by_values = filter_by_mean_and_std(df_out_IA_normalized)
+        df_filtered_by_quantity = normalize_quantity_of_data(
+            df_filtered_by_values, least_data
+        )
 
-        df_out = df_filtered_by_values
+        df_out = df_filtered_by_quantity
         qntOfBuysAfter = len(df_out.loc[df_out["act"] == EnumAct.BUY])
         qntOfSellsAfter = len(df_out.loc[df_out["act"] == EnumAct.SELL])
         qntOfWaitAfter = len(df_out.loc[df_out["act"] == EnumAct.WAIT])
