@@ -31,7 +31,7 @@ class BacktestForMLModule:
             data = self._read_file(from_file)
         elif from_stock_market_data is not None:
             data = self.read_market_data(from_stock_market_data, **kwargs)
-        strategy_in_test = BacktestStrategyModule
+        strategy_in_test = BacktestStrategyForMLModule
 
         bt = Backtest(
             data,
@@ -97,9 +97,9 @@ class EnumAct:
     WAIT = 1
 
 
-class BacktestStrategyModule(Strategy):
+class BacktestStrategyForMLModule(Strategy):
     def init(self):
-        self.ohlc = self.I(data, self.data.df)
+        self.ohlc = self.I(data, self.data.df,plot=False)
         self.ohlc_custom = []
         self.count = -1  ## delaying 2 before to sync with counting
 

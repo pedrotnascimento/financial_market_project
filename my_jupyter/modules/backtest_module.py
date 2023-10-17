@@ -1,5 +1,6 @@
 import pandas as pd
 from my_jupyter.market_data_repository import MarketDataRepository
+from my_jupyter.modules.backtest_for_ml_module import BacktestStrategyForMLModule
 from my_jupyter.strategies.strategy_base import StrategyBase
 from datetime import datetime as dt
 from backtesting import Backtest, Strategy
@@ -24,7 +25,7 @@ class BacktestModule:
             data = self._read_file(from_file)
         elif from_stock_market_data is not None:
             data = self.read_market_data(from_stock_market_data)
-        strategy_in_test = BacktestStrategyModule
+        strategy_in_test = BacktestStrategyForMLModule
 
         bt = Backtest(
             data,
