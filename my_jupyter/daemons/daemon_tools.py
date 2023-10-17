@@ -1,4 +1,4 @@
-# from tools.Mbox import Mbox
+# from tools.SimpleAlert import SimpleAlert
 import threading
 from IPython.display import display, HTML, clear_output
 from datetime import timedelta
@@ -81,7 +81,7 @@ class DaemonThreadMini(threading.Thread):
             # clear_output(wait=True)
             self.job_to_execute(**self.kwargs)
             # if alerta_tempo:
-            #     Mbox.Alerta("SINAIS ATUALIZADOS", "OK")
+            #     SimpleAlert.Alerta("SINAIS ATUALIZADOS", "OK")
             # print("SINAIS ATUALIZADOS")
 
     def wait_until_finish_cycle(self):

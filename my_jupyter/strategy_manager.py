@@ -2,7 +2,7 @@ from datetime import datetime
 from my_jupyter.market_data_repository import MarketDataRepository
 from my_jupyter.operation import Operation
 from my_jupyter.strategies.strategy_base import StrategyBase
-from my_jupyter.modules.alert_module import Mbox
+from my_jupyter.modules.simple_alert import SimpleAlert
 from my_jupyter.user import User
 
 
@@ -47,7 +47,7 @@ class StrategyManager:
         ) 
         if len(positions_buy) > 0:
             if strategy.buy_close(ohlc):
-                Mbox.BoxOkCancelAsync(
+                SimpleAlert.BoxOkCancelAsync(
                     "Buy signal",
                     f"Stock:{operation.stock} Strat:{strategy} Vol:{operation.volume}",
                 )
@@ -58,7 +58,7 @@ class StrategyManager:
         if strategy.check_buy_signal(ohlc):
             print("buy")
             if operation.watch_for_buy:
-                Mbox.BoxOkCancelAsync(
+                SimpleAlert.BoxOkCancelAsync(
                     "Buy signal",
                     f"Stock:{operation.stock} Strat:{strategy} Vol:{operation.volume}",
                 )
@@ -74,7 +74,7 @@ class StrategyManager:
         )
         if len(positions_sell) > 0:
             if strategy.sell_close(ohlc):
-                Mbox.BoxOkCancelAsync(
+                SimpleAlert.BoxOkCancelAsync(
                     "Sell close operation",
                     f"Stock:{operation.stock} Strat:{strategy} Vol:{operation.volume}",
                 )
@@ -85,7 +85,7 @@ class StrategyManager:
         if strategy.check_sell_signal(ohlc):
             print("sell")
             if operation.watch_for_sell:
-                Mbox.BoxOkCancelAsync(
+                SimpleAlert.BoxOkCancelAsync(
                     "Sell Signal",
                     f"Stock:{operation.stock} Strat:{strategy} Vol:{operation.volume}",
                 )
